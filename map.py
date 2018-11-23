@@ -13,7 +13,7 @@ import math
 graph = Graph()
 
 def nodeDistance(self,othernode):
-    return math.sqrt(abs((self.x - othernode.x)**2 - (self.y - othernode.y)**2))
+    return math.sqrt((self.x - othernode.x)**2 + (self.y - othernode.y)**2)
 
 class Node:
     #coordinates of a node
@@ -24,7 +24,7 @@ class Node:
     #distance between two nodes
 
     def __repr__(self):
-        return str(self.x) + "," + str(self.y)
+        return "(" + str(self.x) + "," + str(self.y) + ")"
 
     
 
@@ -60,6 +60,8 @@ graph.addEdge(node2, node3, nodeDistance(node2, node3))
 
 print(dijkstra(graph,node1,node3))
 
+
+
 def getNeigboringNodes(node):
     neighboringNodes = [dijkstra.getNeighbors(node)]
     return neighboringNodes
@@ -94,9 +96,16 @@ def getIntersectionNodes(node1,node2):
 #iterate throughthem and add them into the dictionary classes 
 
 
-
-
-
+def getNearestNode(graph, x, y):
+    minVal = float('inf')
+    desiredNode = None
+    for node in graph.graph.keys():
+        if math.sqrt((node.x - x)**2 + (node.y - y)**2) \
+        < minVal:
+            minVal = math.sqrt((node.x - x)**2 + \
+            (node.y - y)**2)
+            desiredNode = node
+    return desiredNode, minVal
 
 
 
@@ -108,6 +117,11 @@ def init(data):
     data.txt1Y = 20
     data.txt2X = 20
     data.txt2Y = 60
+    data.graph = graph
+    data.previous = dijkstra(graph, node1, node3)[1]
+    data.start = node1
+    data.end = node3
+    data.bound = 15
 
 
 def texts(canvas,data):
@@ -126,14 +140,19 @@ def texts(canvas,data):
 #     pass
 
     
+def drawPath(canvas, previous, start, end):
+    while previous[end] != None:
+        canvas.create_line(end.x,end.y,previous[end].x, \
+            previous[end].y, fill = 'blue', width = 3)
+        end = previous[end]
 
-def drawSquare(data):
-    pass
 
 def mousePressed(event, data):
     # use event.x and event.y
     #changeScreen(data, event.x, event.y)
-    pass
+    desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
+    if minDistance <= data.bound:
+        print(getNearestNode(data.graph, event.x, event.y))
 
 def keyPressed(event, data):
     # use event.char and event.keysym
@@ -144,6 +163,7 @@ def redrawAll(canvas, data):
     canvas.create_text(data.width/2 + 60, 20, fill = "maroon", \
     font = "Times 30 bold", text= "Carnegie Mellon University")
     texts(canvas, data)
+    drawPath(canvas, data.previous, data.start, data.end)
     
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
