@@ -66,7 +66,7 @@ node31 = Node(433,220)
 node32 = Node(427,190)
 node33 = Node(400,231)
 node34 = Node(393,201)
-node35 = Node(327,214)
+node35 = Node(372,214)
 node36 = Node(361,204)
 node37 = Node(386,245)
 node38 = Node(395,266)
@@ -244,10 +244,6 @@ def getNeigboringNodes(node):
 def recommendPlace(node):
     pass
 
-def readFile(path):
-    with open(path, "rt") as f:
-        return f.read()
-
 
 
 
@@ -289,22 +285,26 @@ def init(data):
     data.resizedImg = data.img.resize((data.width, data.height))
     data.picture = ImageTk.PhotoImage(data.img)
     data.txt1X = 20
-    data.txt1Y = 20
+    data.txt1Y = 30
     data.txt2X = 20
-    data.txt2Y = 60
+    data.txt2Y = 170
     data.graph = graph
-    data.previous = dijkstra(graph, node54, node28)[1]
-    data.start = node54
-    data.end = node28
+    data.previous = dijkstra(graph, node6, node42)[1]
+    data.start = node6
+    data.end = node42
     data.bound = 15
 
 
 def texts(canvas,data):
     #MUST CHANGE TO create_text
     canvas.create_text(data.txt1X, data.txt1Y, fill = "blue", \
-        text = "Directions", anchor = NW)
+        text = "Directions", font = "Times 25 bold", anchor = NW)
+    canvas.create_text(data.txt1X, data.txt1Y + 50, fill = 'blue', \
+        text = "Select a start and end point", font = 'Times 15', anchor = NW)
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
-        text = "Import Schedule", anchor = NW)
+        text = "Import Schedule", font= "Times 25 bold", anchor = NW)
+    canvas.create_text(data.txt2X, data.txt2Y + 50, fill = 'blue', \
+        text = "Click here to import your schedule", font = 'Times 15', anchor = NW)
 
 # def changeScreen(data, x, y):
 #     #checks to see if user clicks on the two text buttons
@@ -322,6 +322,13 @@ def drawPath(canvas, previous, start, end):
         end = previous[end]
         print(previous)
 
+def resetButton(canvas, data):
+    canvas.create_rectangle(data.txt1X, data.txt1Y + 70, data.txt1X + 30, \
+        data.txt1Y + 100, outline = 'blue')
+    canvas.create_text(data.txt1X + 20, data.txt1Y + 80, fill = 'blue', \
+        text = "Reset", anchor = NW)
+
+
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -329,6 +336,11 @@ def mousePressed(event, data):
     desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
     if minDistance <= data.bound:
         print(getNearestNode(data.graph, event.x, event.y))
+
+    if event.x >= data.txt1X and event.x <= data.txt2X + 70 and \
+    event.y >= data.txt1Y and event.txt2Y <= data.txt2Y + 70:
+        data.start = None
+        data.end = None
 
 def keyPressed(event, data):
     # use event.char and event.keysym
@@ -340,6 +352,7 @@ def redrawAll(canvas, data):
     font = "Times 30 bold", text= "Carnegie Mellon University")
     texts(canvas, data)
     drawPath(canvas, data.previous, data.start, data.end)
+    resetButton(canvas,data)
     
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
