@@ -23,17 +23,18 @@ class Calendar():
 				startTime = line.split(":")[1]
 			if 'DTEND' in line:
 				endTime = line.split(":")[1]
-			if 'LOCATION' in line:
-				location = line.split("-")[0]
 			if "SUMMARY" in line:
 				course = line.split('::')[1]
+				print(course)
 			if 'BYDAY' in line:
 				dayOfClass = line.split(';')[2].split('=')[1].split(',')
 				print(dayOfClass)
+			if 'LOCATION' in line:
+				location = line.split("-")[0]
+				print(location)
 				for day in dayOfClass:
 					self.Calendar[day].append((course, location, \
-						startTime, endTime))
-				location = None
+						int(str(startTime)[-6:-2]), int(str(endTime)[-6:-2])))
 
 path = 'F18_schedule.ics'
 achillesCalendar = Calendar()

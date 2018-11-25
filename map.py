@@ -1,6 +1,6 @@
 # Basic Animation Framework
-import module_manager
-module_manager.review()
+# import module_manager
+# module_manager.review()
 from tkinter import *
 import cv2
 from PIL import Image, ImageTk
@@ -289,9 +289,9 @@ def init(data):
     data.txt2X = 20
     data.txt2Y = 170
     data.graph = graph
-    data.previous = dijkstra(graph, node6, node42)[1]
-    data.start = node6
-    data.end = node42
+    data.previous = dijkstra(graph, node1, node75)[1]
+    data.start = node1
+    data.end = node75
     data.bound = 15
 
 
