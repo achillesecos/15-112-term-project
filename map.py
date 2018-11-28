@@ -1,6 +1,7 @@
 # Basic Animation Framework
 # import module_manager
 # module_manager.review()
+#cite run function http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 from tkinter import *
 import cv2
 from PIL import Image, ImageTk
@@ -289,58 +290,127 @@ def init(data):
     data.txt2X = 20
     data.txt2Y = 170
     data.graph = graph
-    data.previous = dijkstra(graph, node1, node75)[1]
+    data.previous = dijkstra(graph, node1, node1)[1]
     data.start = node1
-    data.end = node75
+    data.end = node1
     data.bound = 15
+    data.clickCount = 0
+
+
 
 
 def texts(canvas,data):
     #MUST CHANGE TO create_text
     canvas.create_text(data.txt1X, data.txt1Y, fill = "blue", \
-        text = "Directions", font = "Times 25 bold", anchor = NW)
+        text = "Directions", font = "Times 24 bold", anchor = NW)
     canvas.create_text(data.txt1X, data.txt1Y + 50, fill = 'blue', \
         text = "Select a start and end point", font = 'Times 15', anchor = NW)
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
-        text = "Import Schedule", font= "Times 25 bold", anchor = NW)
-    canvas.create_text(data.txt2X, data.txt2Y + 50, fill = 'blue', \
-        text = "Click here to import your schedule", font = 'Times 15', anchor = NW)
+        text = "Import Schedule", font= "Times 24 bold", anchor = NW)
+    
+
+    
+
+def changeScreen(data, x, y):
+    #checks to see if user clicks on the text button
+    if(x >= data.txt2X and x <= data.txt2X + 167 and \
+        y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
+        page1.run()
+    pass
+
 
 # def changeScreen(data, x, y):
-#     #checks to see if user clicks on the two text buttons
-#     if((x >= data.txt1X and x <= data.txt1X + 30 and y >= data.txt1Y and \
-#         y <= data.txt1Y + 30) or (x >= data.txt2X and x <= data.txt2X + 30 and \
-#         y >= data.txt2Y and y <= data.txt2Y + 30)):
-#         page1.run()
-#     pass
-
+#     #checks to see if user clicks on the text button
+#     if(x >= data.txt2X and x <= data.txt2X + 167 and \
+#         y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
+#         #page1.mainloop()
+#         pass
     
 def drawPath(canvas, previous, start, end):
     while previous[end] != None:
         canvas.create_line(end.x,end.y,previous[end].x, \
             previous[end].y, fill = 'blue', width = 3)
         end = previous[end]
-        print(previous)
+        #print(previous)
 
-def resetButton(canvas, data):
-    canvas.create_rectangle(data.txt1X, data.txt1Y + 70, data.txt1X + 30, \
-        data.txt1Y + 100, outline = 'blue')
-    canvas.create_text(data.txt1X + 20, data.txt1Y + 80, fill = 'blue', \
+
+def resetButtonOff(canvas, data):
+    canvas.create_rectangle(data.txt1X, data.txt1Y + 70, data.txt1X + 45, \
+        data.txt1Y + 87, outline = 'blue')
+    canvas.create_text(data.txt1X + 5, data.txt1Y + 70, fill = 'blue', \
         text = "Reset", anchor = NW)
+
+
+def resetButtonOn(canvas, data):
+    canvas.create_rectangle(data.txt1X, data.txt1Y + 70, data.txt1X + 45, \
+        data.txt1Y + 87, outline = 'black')
+    canvas.create_text(data.txt1X + 5, data.txt1Y + 70, fill = 'red', \
+        text = "Reset", anchor = NW)
+
+
+def importScheduleButtonOff(canvas,data):
+        canvas.create_rectangle(data.txt2X, data.txt2Y + 47, data.txt2X + 167, \
+        data.txt2Y + 85, outline = 'blue')
+        canvas.create_text(data.txt2X + 5 , data.txt2Y + 50, fill = 'blue', \
+        text = "Click here to import your schedule", width = 160, \
+        font = 'Times 15', anchor = NW)
+
+
+def importScheduleButtonOn(canvas,data):
+        canvas.create_rectangle(data.txt2X, data.txt2Y + 47, data.txt2X + 167, \
+        data.txt2Y + 85, outline = 'black')
+        canvas.create_text(data.txt2X + 5 , data.txt2Y + 50, fill = 'red', \
+        text = "Click here to import your schedule", width = 160, \
+        font = 'Times 15', anchor = NW)
+        
 
 
 
 def mousePressed(event, data):
     # use event.x and event.y
-    #changeScreen(data, event.x, event.y)
+    changeScreen(data, event.x, event.y)
     desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
-    if minDistance <= data.bound:
-        print(getNearestNode(data.graph, event.x, event.y))
+    #print(desiredNode)
+    #print(minDistance)
+    #print(data.clickCount)
+    if minDistance <= data.bound and data.clickCount == 0:
+        data.start = desiredNode
+        data.clickCount += 1
 
-    if event.x >= data.txt1X and event.x <= data.txt2X + 70 and \
-    event.y >= data.txt1Y and event.txt2Y <= data.txt2Y + 70:
-        data.start = None
-        data.end = None
+    elif minDistance <= data.bound and data.clickCount == 1:
+        data.end = desiredNode
+        data.clickCount += 1
+
+    elif event.x >= data.txt1X and event.x <= data.txt1X + 45 and \
+        event.y >= data.txt1Y + 70 and event.y <= data.txt2Y + 87:
+        data.start = node1
+        data.end = node1
+        #desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
+        data.clickCount == 0
+        
+        
+        
+    data.previous = dijkstra(graph, data.start, data.end)[1]
+    print(data.start, data.end)
+    print(data.previous)
+
+
+def motion(event, canvas, data):
+        flag = False
+        x, y = event.x, event.y
+        print('{}, {}'.format(x,y))
+        if x >= data.txt1X and x <= data.txt1X + 45 and \
+        y >= data.txt1Y + 70 and y <= data.txt1Y + 87:
+            resetButtonOn(canvas,data)
+        else:
+            resetButtonOff(canvas,data)
+
+        if x >= data.txt2X and x <= data.txt2X + 167 and \
+        y >= data.txt2Y + 47 and y <= data.txt2Y + 85:
+            importScheduleButtonOn(canvas,data)
+        else:
+            importScheduleButtonOff(canvas,data)
+
 
 def keyPressed(event, data):
     # use event.char and event.keysym
@@ -348,11 +418,12 @@ def keyPressed(event, data):
 
 def redrawAll(canvas, data):
     canvas.create_image(0, 0,anchor = NW, image = data.picture)
-    canvas.create_text(data.width/2 + 60, 20, fill = "maroon", \
+    canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
     font = "Times 30 bold", text= "Carnegie Mellon University")
     texts(canvas, data)
     drawPath(canvas, data.previous, data.start, data.end)
-    resetButton(canvas,data)
+    resetButtonOff(canvas,data)
+    importScheduleButtonOff(canvas,data)
     
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
@@ -390,6 +461,13 @@ def run(width=300, height=300):
     canvas = Canvas(root, width=data.width, height=data.height)
     canvas.configure(bd=0, highlightthickness=0)
     canvas.pack()
+
+    
+
+    root.bind('<Motion>', lambda event:
+                            motion(event, canvas, data))
+
+
     # set up events
     root.bind("<Button-1>", lambda event:
                             mousePressedWrapper(event, canvas, data))
