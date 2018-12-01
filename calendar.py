@@ -50,14 +50,19 @@ print(achillesCalendar.Calendar)
 
 def getTimesLocation(schedule):
 	result = {}
+	lst = []
 	for day in schedule:
-		#print(schedule[day])
+		print(day + ':')
 		#result[day] = schedule[day]
 		for tup in schedule[day]:
-			#print(schedule[day][tup])
+			print((tup[2],tup[3]))
+			lst.append((tup[2],tup[3]))
+			lst.sort(key=lambda tup: tup[0])
+
+		result[day] = lst
+		lst = []
 			#for eachInfo in schedule[day][tup]:
-			continue
-				#result[schedule[day][tup][eachInfo][2]] = schedule[day][tup][eachInfo][1]
+			#result[schedule[day][tup][eachInfo][2]] = schedule[day][tup][eachInfo][1]
 	return result
 
 print(getTimesLocation(achillesCalendar.Calendar))

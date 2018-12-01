@@ -22,6 +22,9 @@ def addSchedule():
     print(schedule.Calendar)
     return schedule.Calendar
 
+
+
+
 #def run():
 root = Tk()
 
@@ -35,7 +38,7 @@ textbox.pack()
 button = Button(root, text = "Import schedule", command = addSchedule)
 button.pack()
 
-result = Label(root, height = 50 , width = 50, text = addSchedule(), \
+result = Label(root, height = 200 , width = 200, text = getTimesLocation(addSchedule()), \
 	wraplength = 700)
 result.pack()
 

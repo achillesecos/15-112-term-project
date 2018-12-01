@@ -33,6 +33,26 @@ class Node:
         return hash((self.x,self.y))
 
 
+#All locations 
+locations = {"Parking Lot":(572,155), "Baker/Porter Hall":(403,508), \
+            "College of Fine Arts":(525,426), "Cyert Hall":(335,263), \
+            "Doherty Hall":(393,420), "Gates-Hillman Center":(335,332),\
+            "Hammerschlag Hall":(285,499), "Hunt Library":(503,483), \
+            "Newell-Simon Hall":(285,389), "Posner Hall":(583,436), \
+            "Purnell Center":(394,314), "Scaife Hall":(270,562), \
+            "Skibo Gym":(644,405), "University Center":(494,265), \
+            "Wean Hall":(316,442), "Tepper Quad":(242,207)}
+
+#All residences
+residences = {'The Hill Residences':(748,264), 'Donner House':(667,291), \
+            'Resnik Cafe':(640,246), 'West Wing':(585,264), \
+            'Morewood Tower':(317,153), 'Stever House':(299,72), \
+            'Mudge House':(254,43)}
+
+
+
+
+#All intersections of paths
 node1 = Node(758,150)
 node2 = Node(702,262)
 node3 = Node(686,247)
@@ -109,6 +129,8 @@ node73 = Node(190,342)
 node74 = Node(340,93)
 node75 = Node(258,7)
 node76 = Node(439,420)
+node77 = Node(356,353)
+node78 = Node(317,343)
 
 
 
@@ -233,7 +255,9 @@ graph.addEdge(node74, node75, nodeDistance(node74, node75))
 graph.addEdge(node42, node76, nodeDistance(node42, node76))
 graph.addEdge(node76, node49, nodeDistance(node76, node49))
 graph.addEdge(node49, node50, nodeDistance(node49, node50))
-
+graph.addEdge(node39, node77, nodeDistance(node39, node77))
+graph.addEdge(node77, node78, nodeDistance(node77, node78))
+graph.addEdge(node60, node78, nodeDistance(node60, node78))
 #print(dijkstra(graph,node1,node10))
 
 
@@ -296,6 +320,10 @@ def init(data):
     data.bound = 15
     data.clickCount = 0
 
+    #dealing with locations
+    data.locationResidenceBound = 30
+    data.startLocation = ''
+    data.endLocation = ''
 
 
 
@@ -386,7 +414,45 @@ def mousePressed(event, data):
         data.end = node1
         #desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
         data.clickCount == 0
-        
+        data.startLocation = ''
+        data.endLocation = ''
+
+    for location in locations:
+        if math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (location)
+            data.startLocation = location
+            data.clickCount += 1
+        elif math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(location)
+            data.endLocation = location
+            data.clickCount += 1
+
+    for residence in residences:
+        if math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (residence)
+            data.startLocation = residence
+            data.clickCount += 1
+            print(data.clickCount)
+        elif math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(residence)
+            data.endLocation = residence
+            data.clickCount += 1
+
+
+
+def textOfLocation(canvas, data):
+    canvas.create_text(data.txt2X, data.txt2Y + 300, fill = 'blue', \
+        text = "Start: " + data.startLocation, anchor = NW)
+    canvas.create_text(data.txt2X, data.txt2Y + 350, fill = 'blue', \
+        text = "End: " + data.endLocation, anchor = NW) 
         
         
     data.previous = dijkstra(graph, data.start, data.end)[1]
@@ -394,21 +460,62 @@ def mousePressed(event, data):
     print(data.previous)
 
 
-def motion(event, canvas, data):
-        flag = False
-        x, y = event.x, event.y
-        #print('{}, {}'.format(x,y))
-        if x >= data.txt1X and x <= data.txt1X + 45 and \
-        y >= data.txt1Y + 70 and y <= data.txt1Y + 87:
-            resetButtonOn(canvas,data)
-        else:
-            resetButtonOff(canvas,data)
+# def locationBoundaryOn(canvas, data):
+#     canvas.create_oval(locations[location][0] - \
+#     data.locationResidenceBound, locations[location][1] - \
+#     data.locationResidenceBound, locations[location][0] + \
+#     data.locationResidenceBound, locations[location][1] + \
+#     data.locationResidenceBound, outline = 'blue')
 
-        if x >= data.txt2X and x <= data.txt2X + 167 and \
-        y >= data.txt2Y + 47 and y <= data.txt2Y + 85:
-            importScheduleButtonOn(canvas,data)
-        else:
-            importScheduleButtonOff(canvas,data)
+# def locationBoundaryOff(canvas, data):
+#     canvas.create_oval(locations[location][0] - \
+#     data.locationResidenceBound, locations[location][1] - \
+#     data.locationResidenceBound, locations[location][0] + \
+#     data.locationResidenceBound, locations[location][1] + \
+#     data.locationResidenceBound, outline = 'white')
+
+
+def motion(event, canvas, data):
+    flag = False
+    x, y = event.x, event.y
+    #print('{}, {}'.format(x,y))
+    if x >= data.txt1X and x <= data.txt1X + 45 and \
+    y >= data.txt1Y + 70 and y <= data.txt1Y + 87:
+        resetButtonOn(canvas,data)
+    else:
+        resetButtonOff(canvas,data)
+
+    if x >= data.txt2X and x <= data.txt2X + 167 and \
+    y >= data.txt2Y + 47 and y <= data.txt2Y + 85:
+        importScheduleButtonOn(canvas,data)
+    else:
+        importScheduleButtonOff(canvas,data)
+
+    for location in locations:
+        if math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound:
+            canvas.create_oval(locations[location][0] - \
+            data.locationResidenceBound, locations[location][1] - \
+            data.locationResidenceBound, locations[location][0] + \
+            data.locationResidenceBound, locations[location][1] + \
+            data.locationResidenceBound, outline = 'blue', tags = 'circle1')
+            #print(canvas.circle1)
+        elif not math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound:
+            canvas.delete('circle1')
+
+    for residence in residences:
+        if math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
+            canvas.create_oval(residences[residence][0] - \
+            data.locationResidenceBound, residences[residence][1] - \
+            data.locationResidenceBound, residences[residence][0] + \
+            data.locationResidenceBound, residences[residence][1] + \
+            data.locationResidenceBound, outline = 'blue', tags = 'circle2')
+            #print(canvas.circle2)
+        elif not math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
+            canvas.delete('cricle2')
 
 
 def keyPressed(event, data):
@@ -423,6 +530,7 @@ def redrawAll(canvas, data):
     drawPath(canvas, data.previous, data.start, data.end)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
+    textOfLocation(canvas, data)
     
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
