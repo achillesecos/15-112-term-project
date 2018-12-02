@@ -55,9 +55,9 @@ def getTimesLocation(schedule):
 		print(day + ':')
 		#result[day] = schedule[day]
 		for tup in schedule[day]:
-			print((tup[2],tup[3]))
-			lst.append((tup[2],tup[3]))
-			lst.sort(key=lambda tup: tup[0])
+			print((tup[0],tup[2],tup[3]))
+			lst.append((tup[0],tup[2],tup[3]))
+			lst.sort(key=lambda tup: tup[1])
 
 		result[day] = lst
 		lst = []

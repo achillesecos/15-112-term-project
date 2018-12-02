@@ -7,7 +7,10 @@ import cv2
 from PIL import Image, ImageTk
 from dijkstra import *
 import math
+from tkinter import filedialog
 #from schedulepage import *
+from calendar import *
+import datetime
 
 
 
@@ -325,6 +328,12 @@ def init(data):
     data.startLocation = ''
     data.endLocation = ''
 
+    #calendar
+    data.calendar = Calendar()
+    data.currentDay = datetime.datetime.now()
+    data.currentTime = datetime.datetime.now()
+    data.currentClasses = ''
+
 
 
 def texts(canvas,data):
@@ -335,6 +344,8 @@ def texts(canvas,data):
         text = "Select a start and end point", font = 'Times 15', anchor = NW)
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
         text = "Import Schedule", font= "Times 24 bold", anchor = NW)
+    canvas.create_text(data.txt1X, data.txt2Y + 100, text = data.currentClasses,\
+        width = 150, anchor = NW)
     
 
     
@@ -343,22 +354,28 @@ def changeScreen(data, x, y):
     #checks to see if user clicks on the text button
     if(x >= data.txt2X and x <= data.txt2X + 167 and \
         y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
-        exec(open(r'schedulepage.py').read())
+        filename = filedialog.askopenfilename(initialdir = "/",title = "Select file", \
+            filetypes = (("ics files","*.ics"),("all files","*.*")))
+        #exec(open(r'schedulepage.py').read())
+        data.calendar.classSchedule(filename)
+        print(data.calendar.Calendar)
 
-
-# def changeScreen(data, x, y):
-#     #checks to see if user clicks on the text button
-#     if(x >= data.txt2X and x <= data.txt2X + 167 and \
-#         y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
-#         #page1.mainloop()
-#         pass
+    for day in getTimesLocation(data.calendar.Calendar):
+        print(day)
+        print(data.currentDay.strftime('%A').upper()[:2])
+    #check 'MO' for monday, since there are no classes SA and SU
+    #data.currentDay.strftime('%A').upper()[:2]
+        if day == 'MO':
+            print('poop')
+            data.currentClasses = 'Your classes for ' + day + ' are: ' + \
+                str(getTimesLocation(data.calendar.Calendar)[day])
     
 def drawPath(canvas, previous, start, end):
     while previous[end] != None:
         canvas.create_line(end.x,end.y,previous[end].x, \
             previous[end].y, fill = 'blue', width = 3)
         end = previous[end]
-        #print(previous)
+        print(previous)
 
 
 def resetButtonOff(canvas, data):
@@ -400,6 +417,44 @@ def mousePressed(event, data):
     #print(desiredNode)
     #print(minDistance)
     #print(data.clickCount)
+
+    for location in locations:
+        if math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (location)
+            data.startLocation = location
+            data.start = desiredNode
+            data.clickCount += 1
+
+
+        elif math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(location)
+            data.endLocation = location
+            data.end = desiredNode
+            data.clickCount += 1
+
+    for residence in residences:
+        if math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (residence)
+            data.startLocation = residence
+            data.start = desiredNode
+            data.clickCount += 1
+            print(data.clickCount)
+        elif math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(residence)
+            data.endLocation = residence
+            data.end = desiredNode
+            data.clickCount += 1
+
+
+
     if minDistance <= data.bound and data.clickCount == 0:
         data.start = desiredNode
         data.clickCount += 1
@@ -413,38 +468,11 @@ def mousePressed(event, data):
         data.start = node1
         data.end = node1
         #desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
-        data.clickCount == 0
+        data.clickCount = 0
         data.startLocation = ''
         data.endLocation = ''
 
-    for location in locations:
-        if math.sqrt((locations[location][0] - event.x)**2 + \
-            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
-        data.clickCount == 0:
-            print (location)
-            data.startLocation = location
-            data.clickCount += 1
-        elif math.sqrt((locations[location][0] - event.x)**2 + \
-            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
-        data.clickCount == 1:
-            print(location)
-            data.endLocation = location
-            data.clickCount += 1
 
-    for residence in residences:
-        if math.sqrt((residences[residence][0] - event.x)**2 + \
-            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
-        data.clickCount == 0:
-            print (residence)
-            data.startLocation = residence
-            data.clickCount += 1
-            print(data.clickCount)
-        elif math.sqrt((residences[residence][0] - event.x)**2 + \
-            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
-        data.clickCount == 1:
-            print(residence)
-            data.endLocation = residence
-            data.clickCount += 1
 
 
 
@@ -491,19 +519,23 @@ def motion(event, canvas, data):
     else:
         importScheduleButtonOff(canvas,data)
 
+    locationFlag = False
     for location in locations:
-        if math.sqrt((locations[location][0] - event.x)**2 + \
-            (locations[location][1] - event.y)**2)< data.locationResidenceBound:
+        if math.sqrt((locations[location][0] - x)**2 + \
+            (locations[location][1] - y)**2)< data.locationResidenceBound:
             canvas.create_oval(locations[location][0] - \
             data.locationResidenceBound, locations[location][1] - \
             data.locationResidenceBound, locations[location][0] + \
             data.locationResidenceBound, locations[location][1] + \
             data.locationResidenceBound, outline = 'blue', tags = 'circle1')
-            #print(canvas.circle1)
-        elif not math.sqrt((locations[location][0] - event.x)**2 + \
-            (locations[location][1] - event.y)**2)< data.locationResidenceBound:
-            canvas.delete('circle1')
+            locationFlag = True
+            # print(canvas.circle1)
+        # elif not math.sqrt((locations[location][0] - event.x)**2 + \
+        #     (locations[location][1] - event.y)**2)< data.locationResidenceBound:
+    if not locationFlag:
+        canvas.delete('circle1')
 
+    residenceFlag = False
     for residence in residences:
         if math.sqrt((residences[residence][0] - event.x)**2 + \
             (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
@@ -512,10 +544,12 @@ def motion(event, canvas, data):
             data.locationResidenceBound, residences[residence][0] + \
             data.locationResidenceBound, residences[residence][1] + \
             data.locationResidenceBound, outline = 'blue', tags = 'circle2')
-            #print(canvas.circle2)
-        elif not math.sqrt((residences[residence][0] - event.x)**2 + \
-            (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
-            canvas.delete('cricle2')
+            residenceFlag = True
+            # print(canvas.circle2)
+        # elif not math.sqrt((residences[residence][0] - event.x)**2 + \
+        #     (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
+    if not residenceFlag:
+        canvas.delete('circle2')
 
 
 def keyPressed(event, data):
@@ -527,10 +561,13 @@ def redrawAll(canvas, data):
     canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
     font = "Times 30 bold", text= "Carnegie Mellon University")
     texts(canvas, data)
-    drawPath(canvas, data.previous, data.start, data.end)
+    if data.end != data.start:
+        drawPath(canvas, data.previous, data.start, data.end)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
     textOfLocation(canvas, data)
+    canvas.create_oval(data.start.x- 5, data.start.y- 5,data.start.x+ 5, data.start.y+ 5)
+    canvas.create_oval(data.end.x- 5, data.end.y- 5,data.end.x+ 5, data.end.y+ 5)
     
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
@@ -584,4 +621,4 @@ def run(width=300, height=300):
     # and launch the app
     root.mainloop()  # blocks until window is closed
 
-run(810, 580)
+run(810, 600)
