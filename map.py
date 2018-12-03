@@ -261,7 +261,7 @@ graph.addEdge(node49, node50, nodeDistance(node49, node50))
 graph.addEdge(node39, node77, nodeDistance(node39, node77))
 graph.addEdge(node77, node78, nodeDistance(node77, node78))
 graph.addEdge(node60, node78, nodeDistance(node60, node78))
-#print(dijkstra(graph,node1,node10))
+print('Test grapjhhhhh',dijkstra(graph,node75,node49))
 
 
 
@@ -376,6 +376,7 @@ def drawPath(canvas, previous, start, end):
             previous[end].y, fill = 'blue', width = 3)
         end = previous[end]
         print(previous)
+        print(previous[end])
 
 
 def resetButtonOff(canvas, data):
@@ -425,6 +426,7 @@ def mousePressed(event, data):
             print (location)
             data.startLocation = location
             data.start = desiredNode
+            print(desiredNode, 'theStartLocation1')
             data.clickCount += 1
 
 
@@ -434,6 +436,7 @@ def mousePressed(event, data):
             print(location)
             data.endLocation = location
             data.end = desiredNode
+            print(desiredNode, 'theEndLocation2')
             data.clickCount += 1
 
     for residence in residences:
@@ -443,13 +446,16 @@ def mousePressed(event, data):
             print (residence)
             data.startLocation = residence
             data.start = desiredNode
+            print(desiredNode, 'theStartResidence3')
             data.clickCount += 1
             print(data.clickCount)
+
         elif math.sqrt((residences[residence][0] - event.x)**2 + \
             (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
         data.clickCount == 1:
             print(residence)
             data.endLocation = residence
+            print(desiredNode, 'theEndResidence4')
             data.end = desiredNode
             data.clickCount += 1
 
@@ -461,6 +467,7 @@ def mousePressed(event, data):
 
     elif minDistance <= data.bound and data.clickCount == 1:
         data.end = desiredNode
+        
         data.clickCount += 1
 
     elif event.x >= data.txt1X and event.x <= data.txt1X + 45 and \
