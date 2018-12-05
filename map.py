@@ -243,7 +243,7 @@ graph.addEdge(node38, node48, nodeDistance(node38, node48))
 graph.addEdge(node48, node62, nodeDistance(node48, node62))
 graph.addEdge(node62, node55, nodeDistance(node62, node55))
 graph.addEdge(node35, node57, nodeDistance(node35, node57))
-graph.addEdge(node35, node57, nodeDistance(node35, node57))
+graph.addEdge(node35, node33, nodeDistance(node35, node33))
 graph.addEdge(node56, node57, nodeDistance(node56, node57))
 graph.addEdge(node57, node58, nodeDistance(node57, node58))
 graph.addEdge(node58, node59, nodeDistance(node58, node59))
@@ -332,11 +332,19 @@ def init(data):
     data.calendar = Calendar()
     data.currentDay = datetime.datetime.now()
     data.currentTime = datetime.datetime.now()
-    data.currentClasses = ''
+    data.currentClasses = 'Your classes for today are: '
+    
+    data.startButClick = 0
+    data.str1 = ''
+    data.str2 = ''
+    data.str3 = ''
+    data.startBFlag = False
 
-
+    data.timerCounter = 0
 
 def texts(canvas,data):
+    canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
+    font = "Times 30 bold", text= "Carnegie Mellon University")
     #MUST CHANGE TO create_text
     canvas.create_text(data.txt1X, data.txt1Y, fill = "blue", \
         text = "Directions", font = "Times 24 bold", anchor = NW)
@@ -344,9 +352,36 @@ def texts(canvas,data):
         text = "Select a start and end point", font = 'Times 15', anchor = NW)
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
         text = "Import Schedule", font= "Times 24 bold", anchor = NW)
-    canvas.create_text(data.txt1X, data.txt2Y + 100, text = data.currentClasses,\
-        width = 150, anchor = NW)
-    
+
+    # for day in getTimesLocation(data.calendar.Calendar):
+    #     if day == data.currentDay.strftime('%A').upper()[:2]:
+            
+    #         data.currentClasses = 'Your classes for today are: ' + \
+    #             str(getTimesLocation(data.calendar.Calendar)[day])
+    if not(data.startBFlag):
+        canvas.create_text(data.txt1X, 600, text = data.currentClasses, anchor = NW, \
+        fill = 'white', width = 700)
+
+    else:
+        text1 = canvas.create_text(data.txt1X, 600, text = data.str1, anchor = NW, \
+            fill = 'white', width = 700)
+
+        bound1Width = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
+        
+        text2 = canvas.create_text(data.txt1X + bound1Width, 600, text = data.str2, anchor = NW, \
+            fill = 'red', width = 700 - bound1Width)
+
+        bound2Width = canvas.bbox(text2)[2] - canvas.bbox(text2)[0]
+
+        canvas.create_text(data.txt1X + bound1Width + bound2Width, 600, text = data.str3, anchor = NW, \
+            fill = 'white', width = 700 - bound1Width - bound2Width)
+
+
+    # canvas.create_text(data.txt1X, 600, text = data.str1,\
+    #     width = 700, anchor = NW, fill = 'white')
+
+
+    canvas.create_text(760,607,text = "Start", fill = 'white', anchor = NW)
 
     
 
@@ -360,15 +395,30 @@ def changeScreen(data, x, y):
         data.calendar.classSchedule(filename)
         print(data.calendar.Calendar)
 
+
+    info = ''
     for day in getTimesLocation(data.calendar.Calendar):
         print(day)
         print(data.currentDay.strftime('%A').upper()[:2])
     #check 'MO' for monday, since there are no classes SA and SU
-    #data.currentDay.strftime('%A').upper()[:2]
-        if day == 'MO':
+        if day == data.currentDay.strftime('%A').upper()[:2]:
             print('poop')
-            data.currentClasses = 'Your classes for ' + day + ' are: ' + \
-                str(getTimesLocation(data.calendar.Calendar)[day])
+
+            for item in getTimesLocation(data.calendar.Calendar)[day]:
+                print(info, 'this is info')
+                info += '"' + item[0] + '"' +\
+                ' from ' + str(item[1])[:len(str(item[1]))-2] + ':' + \
+                str(item[1])[len(str(item[1]))-2:] +\
+                ' to ' + str(item[2])[:len(str(item[1]))-2] + ':' +\
+                str(item[2])[len(str(item[1]))-2:] + ', '
+                data.currentClasses = 'Your classes for today are: ' + \
+                info
+        info = ''
+
+
+
+            # data.currentClasses = 'Your classes for today are: ' + \
+            #     str(getTimesLocation(data.calendar.Calendar)[day])
     
 def drawPath(canvas, previous, start, end):
     while previous[end] != None:
@@ -377,6 +427,9 @@ def drawPath(canvas, previous, start, end):
         end = previous[end]
         print(previous)
         print(previous[end])
+
+def drawPathOfSchedule(canvas, previous,start,end):
+    pass
 
 
 def resetButtonOff(canvas, data):
@@ -408,6 +461,11 @@ def importScheduleButtonOn(canvas,data):
         text = "Click here to import your schedule", width = 160, \
         font = 'Times 15', anchor = NW)
         
+
+def timerFired(data):
+    data.timerCounter += 1
+
+
 
 
 
@@ -480,7 +538,65 @@ def mousePressed(event, data):
         data.endLocation = ''
 
 
+    #If user clicks 'Start' button for schedule path finding
+    if event.x >= 750 and event.x <= 800 and event.y >= 600 and \
+    event.y <= 630:
+        data.startBFlag = True
+        data.startButClick += 1
+        #coloredSubStr = '<span style=\' color:red;\'>'
+        newStrArr = data.currentClasses[28:].split(',')
+        print(newStrArr)
+        # coloredSubStr = newStrArr[data.startButClick]
+        data.str1 = 'Your classes for today are: ' + \
+        str(newStrArr[0:data.startButClick+1])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        print('str1 is', data.str1)
 
+        data.str2 = str(newStrArr[data.startButClick-1])
+        print('str2 is', data.str2)
+        data.str3 = str(newStrArr[data.startButClick:])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        print('str3 is', data.str3)
+        # data.currentClasses = 'Your classes for today are: ' + \
+        # str(newStrArr)
+
+        
+
+        #info = ''
+        #drawPathOfSchedule()
+        # for day in getTimesLocation(data.calendar.Calendar):
+        #     if day == data.currentDay.strftime('%A').upper()[:2]:
+        #         print('poop')
+        #         data.currentClasses = 'Your classes for today are: ' + \
+        #             str(getTimesLocation(data.calendar.Calendar)[day])
+
+        #         for item in getTimesLocation(data.calendar.Calendar)[day]:
+        #             print(info, 'this is info')
+        #             info += '"' + item[0] + '"' +\
+        #             ' from ' + str(item[1])[:len(str(item[1]))-2] + ':' + \
+        #             str(item[1])[len(str(item[1]))-2:] +\
+        #             ' to ' + str(item[2])[:len(str(item[1]))-2] + ':' +\
+        #             str(item[2])[len(str(item[1]))-2:] + ','
+        #             data.currentClasses = 'Your classes for today are: ' + \
+        #             info
+        #     info = ''
+
+
+                #print(getTimesLocation(data.calendar.Calendar)[day][item][0], 'fadfasdf')
+
+                #data.currentClasses = 'Your classes for today are: ' + info
+                #info = ''
+
+            #else:
+             #   continue
+
+
+
+
+
+def scheduleBox(canvas, data):
+    canvas.create_rectangle(0,580,810,650,fill = 'blue')
+
+def startScheduleButton(canvas,data):
+    canvas.create_rectangle(750,600,800,630,outline = 'white')
 
 
 def textOfLocation(canvas, data):
@@ -565,17 +681,20 @@ def keyPressed(event, data):
 
 def redrawAll(canvas, data):
     canvas.create_image(0, 0,anchor = NW, image = data.picture)
-    canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
-    font = "Times 30 bold", text= "Carnegie Mellon University")
+    scheduleBox(canvas,data)
     texts(canvas, data)
     if data.end != data.start:
         drawPath(canvas, data.previous, data.start, data.end)
+
+    #drawPathOfSchedule(canvas,data.previous)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
     textOfLocation(canvas, data)
     canvas.create_oval(data.start.x- 5, data.start.y- 5,data.start.x+ 5, data.start.y+ 5)
     canvas.create_oval(data.end.x- 5, data.end.y- 5,data.end.x+ 5, data.end.y+ 5)
-    
+    startScheduleButton(canvas,data)
+
+
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
 #canvas.create_image(0,0,anchor = NW, image = img)
@@ -599,11 +718,17 @@ def run(width=300, height=300):
         keyPressed(event, data)
         redrawAllWrapper(canvas, data)
 
+    def timerFiredWrapper(canvas, data):
+        timerFired(data)
+        redrawAllWrapper(canvas,data)
+        canvas.after(data.timerDelay, timerFiredWrapper,canvas,data)
+
     # Set up data and call init
     class Struct(object): pass
     data = Struct()
     data.width = width
     data.height = height
+    data.timerDelay = 100
     root = Tk()
     root.resizable(width=False, height=False) # prevents resizing window
     init(data)
@@ -625,7 +750,8 @@ def run(width=300, height=300):
     root.bind("<Key>", lambda event:
                             keyPressedWrapper(event, canvas, data))
     redrawAll(canvas, data)
+    timerFiredWrapper(canvas,data)
     # and launch the app
     root.mainloop()  # blocks until window is closed
 
-run(810, 600)
+run(810, 650)

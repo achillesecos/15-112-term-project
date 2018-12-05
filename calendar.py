@@ -65,7 +65,34 @@ def getTimesLocation(schedule):
 			#result[schedule[day][tup][eachInfo][2]] = schedule[day][tup][eachInfo][1]
 	return result
 
-print(getTimesLocation(achillesCalendar.Calendar))
+def getLocations(schedule):
+	result = {}
+	lst = []
+	for day in schedule:
+		print(day + ':')
+		#result[day] = schedule[day]
+		for tup in schedule[day]:
+			print((tup[1]))
+			lst.append((tup[1],tup[2]))
+			lst.sort(key=lambda tup: tup[1])
+
+		result[day] = lst
+		lst = []
+		
+	return result
+
+
+#print(getTimesLocation(achillesCalendar.Calendar)['MO'])
+print(getLocations(achillesCalendar.Calendar))
+
+def getTodayClasses(schedule,day):
+	result = []
+	for i in range(1,len(schedule[day])):
+		print('result is', result)
+		result.append((schedule[day][i-1][0][9:], schedule[day][i][0][9:]))
+	return result
+
+print(getTodayClasses(getLocations(achillesCalendar.Calendar), 'MO'))
 
 
 
