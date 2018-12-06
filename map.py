@@ -53,6 +53,7 @@ residences = {'The Hill Residences':(748,264), 'Donner House':(667,291), \
             'Mudge House':(254,43)}
 
 
+classLocations = {'GHC':(335,332), 'POS':(583,436), 'WEH':(316,442), }
 
 
 #All intersections of paths
@@ -261,6 +262,19 @@ graph.addEdge(node49, node50, nodeDistance(node49, node50))
 graph.addEdge(node39, node77, nodeDistance(node39, node77))
 graph.addEdge(node77, node78, nodeDistance(node77, node78))
 graph.addEdge(node60, node78, nodeDistance(node60, node78))
+
+
+
+
+
+
+
+
+
+
+
+
+
 print('Test grapjhhhhh',dijkstra(graph,node75,node49))
 
 
@@ -317,9 +331,9 @@ def init(data):
     data.txt2X = 20
     data.txt2Y = 170
     data.graph = graph
-    data.previous = dijkstra(graph, node1, node1)[1]
-    data.start = node1
-    data.end = node1
+    data.previous = None
+    data.start = None
+    data.end = None
     data.bound = 15
     data.clickCount = 0
 
@@ -340,7 +354,10 @@ def init(data):
     data.str3 = ''
     data.startBFlag = False
 
+    data.colorArr = []
+
     data.timerCounter = 0
+    data.idx = 0
 
 def texts(canvas,data):
     canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
@@ -363,22 +380,38 @@ def texts(canvas,data):
         fill = 'white', width = 700)
 
     else:
-        text1 = canvas.create_text(data.txt1X, 600, text = data.str1, anchor = NW, \
-            fill = 'white', width = 700)
+        # text1 = canvas.create_text(data.txt1X, 600, text = data.str1, anchor = NW, \
+        #     fill = 'white', width = 700)
 
-        bound1Width = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
+        # bound1Width = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
         
-        text2 = canvas.create_text(data.txt1X + bound1Width, 600, text = data.str2, anchor = NW, \
-            fill = 'red', width = 700 - bound1Width)
+        # text2 = canvas.create_text(data.txt1X + bound1Width, 600, text = data.str2, anchor = NW, \
+        #     fill = 'red', width = 700 - bound1Width)
 
-        bound2Width = canvas.bbox(text2)[2] - canvas.bbox(text2)[0]
+        # bound2Width = canvas.bbox(text2)[2] - canvas.bbox(text2)[0]
 
-        canvas.create_text(data.txt1X + bound1Width + bound2Width, 600, text = data.str3, anchor = NW, \
-            fill = 'white', width = 700 - bound1Width - bound2Width)
+        # canvas.create_text(data.txt1X + bound1Width + bound2Width, 600, text = data.str3, anchor = NW, \
+        #     fill = 'white', width = 700 - bound1Width - bound2Width)
+        startX = data.txt1X
+        startY = 600
+        if hasattr(data,'newStrArr'):
+            for i in range(len(data.colorArr)):
+                text1 = canvas.create_text(startX, startY, text = data.newStrArr[i], anchor = NW,\
+                    fill = data.colorArr[i], width = 700, tag = 'textTag' + str(i))
+                boundWidth = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
+                startX += boundWidth
+                if canvas.bbox(text1)[2] >= 700:
+                    boundHeight = canvas.bbox(text1)[3] - canvas.bbox(text1)[1]
+                    canvas.delete('textTag' + str(i))
+                    startY += boundHeight
+                    startX = data.txt1X
+                    text1 = canvas.create_text(startX, startY, text = data.newStrArr[i], anchor = NW,\
+                    fill = data.colorArr[i], width = 700)
+                    startX += boundWidth
 
 
-    # canvas.create_text(data.txt1X, 600, text = data.str1,\
-    #     width = 700, anchor = NW, fill = 'white')
+        # canvas.create_text(data.txt1X, 600, text = data.str1,\
+        # width = 700, anchor = NW, fill = 'white')
 
 
     canvas.create_text(760,607,text = "Start", fill = 'white', anchor = NW)
@@ -393,16 +426,16 @@ def changeScreen(data, x, y):
             filetypes = (("ics files","*.ics"),("all files","*.*")))
         #exec(open(r'schedulepage.py').read())
         data.calendar.classSchedule(filename)
-        print(data.calendar.Calendar)
+        # print(data.calendar.Calendar)
 
 
     info = ''
     for day in getTimesLocation(data.calendar.Calendar):
-        print(day)
-        print(data.currentDay.strftime('%A').upper()[:2])
+        # print(day)
+        # print(data.currentDay.strftime('%A').upper()[:2])
     #check 'MO' for monday, since there are no classes SA and SU
-        if day == data.currentDay.strftime('%A').upper()[:2]:
-            print('poop')
+    #data.currentDay.strftime('%A').upper()[:2]
+        if day == 'TH':
 
             for item in getTimesLocation(data.calendar.Calendar)[day]:
                 print(info, 'this is info')
@@ -413,6 +446,10 @@ def changeScreen(data, x, y):
                 str(item[2])[len(str(item[1]))-2:] + ', '
                 data.currentClasses = 'Your classes for today are: ' + \
                 info
+                data.newStrArr0 = data.currentClasses.split(': ')[0]
+                data.newStrArr = data.currentClasses.split(': ')[1].split(',')
+                data.newStrArr.insert(0, data.newStrArr0)
+                data.colorArr = ['white' for i in range(len(data.newStrArr))]
         info = ''
 
 
@@ -428,8 +465,6 @@ def drawPath(canvas, previous, start, end):
         print(previous)
         print(previous[end])
 
-def drawPathOfSchedule(canvas, previous,start,end):
-    pass
 
 
 def resetButtonOff(canvas, data):
@@ -462,8 +497,25 @@ def importScheduleButtonOn(canvas,data):
         font = 'Times 15', anchor = NW)
         
 
-def timerFired(data):
-    data.timerCounter += 1
+def drawPathOfSchedule(data):
+    #class to class array
+    CTCArr = getTodayClasses(getLocations(data.calendar.Calendar), \
+        data.currentDay.strftime('%A').upper()[:2])
+    # for pair in CTCArr:
+    #     print('start',classLocations[pair[0]])
+    #     print('end',classLocations[pair[1]])
+    print('class Locations', classLocations)
+
+    if data.startButClick != 0:
+        data.start = getNearestNode(data.graph, classLocations[CTCArr[data.startButClick-1][0]][0], \
+            classLocations[CTCArr[data.startButClick-1][0]][1])[0]
+        data.end = getNearestNode(data.graph, classLocations[CTCArr[data.startButClick][1]][0], \
+            classLocations[CTCArr[data.startButClick][1]][1])[0]
+        print('this is data.start',data.start)
+        print('this is data.end',data.end)
+
+
+    
 
 
 
@@ -530,8 +582,8 @@ def mousePressed(event, data):
 
     elif event.x >= data.txt1X and event.x <= data.txt1X + 45 and \
         event.y >= data.txt1Y + 70 and event.y <= data.txt2Y + 87:
-        data.start = node1
-        data.end = node1
+        data.start = None
+        data.end = None
         #desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
         data.clickCount = 0
         data.startLocation = ''
@@ -543,18 +595,38 @@ def mousePressed(event, data):
     event.y <= 630:
         data.startBFlag = True
         data.startButClick += 1
-        #coloredSubStr = '<span style=\' color:red;\'>'
-        newStrArr = data.currentClasses[28:].split(',')
-        print(newStrArr)
-        # coloredSubStr = newStrArr[data.startButClick]
-        data.str1 = 'Your classes for today are: ' + \
-        str(newStrArr[0:data.startButClick+1])[2:len(str(newStrArr[:data.startButClick-1]))-2]
-        print('str1 is', data.str1)
 
-        data.str2 = str(newStrArr[data.startButClick-1])
-        print('str2 is', data.str2)
-        data.str3 = str(newStrArr[data.startButClick:])[2:len(str(newStrArr[:data.startButClick-1]))-2]
-        print('str3 is', data.str3)
+        if data.startButClick >= len(data.colorArr):
+            data.startButClick = 1
+
+        data.colorArr[data.startButClick] = 'red'
+        data.colorArr[data.startButClick-1] = 'white'
+        
+        data.idx += 1
+        drawPathOfSchedule(data)
+
+
+
+
+
+        #newStrArr = data.currentClasses[28:].split(',')
+        
+
+
+        #coloredSubStr = '<span style=\' color:red;\'>'
+        
+        #print(newStrArr)
+        #coloredSubStr = newStrArr[data.startButClick]
+
+
+        # data.str1 = 'Your classes for today are: ' + \
+        # str(newStrArr[0:data.startButClick+1])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        # print('str1 is', data.str1)
+
+        # data.str2 = str(newStrArr[data.startButClick-1])
+        # print('str2 is', data.str2)
+        # data.str3 = str(newStrArr[data.startButClick:])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        # print('str3 is', data.str3)
         # data.currentClasses = 'Your classes for today are: ' + \
         # str(newStrArr)
 
@@ -608,7 +680,7 @@ def textOfLocation(canvas, data):
         
     data.previous = dijkstra(graph, data.start, data.end)[1]
     print(data.start, data.end)
-    print(data.previous)
+    print('THE PREVIOUS STUFF',data.previous)
 
 
 # def locationBoundaryOn(canvas, data):
@@ -683,15 +755,17 @@ def redrawAll(canvas, data):
     canvas.create_image(0, 0,anchor = NW, image = data.picture)
     scheduleBox(canvas,data)
     texts(canvas, data)
-    if data.end != data.start:
+    textOfLocation(canvas, data)
+    if data.end != data.start and not(data.start is None or data.end is None):
         drawPath(canvas, data.previous, data.start, data.end)
+
 
     #drawPathOfSchedule(canvas,data.previous)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
-    textOfLocation(canvas, data)
-    canvas.create_oval(data.start.x- 5, data.start.y- 5,data.start.x+ 5, data.start.y+ 5)
-    canvas.create_oval(data.end.x- 5, data.end.y- 5,data.end.x+ 5, data.end.y+ 5)
+    # if not(data.start is None or data.end is None):
+    #     canvas.create_oval(data.start.x- 5, data.start.y- 5,data.start.x+ 5, data.start.y+ 5)
+    #     canvas.create_oval(data.end.x- 5, data.end.y- 5,data.end.x+ 5, data.end.y+ 5)
     startScheduleButton(canvas,data)
 
 
@@ -718,10 +792,6 @@ def run(width=300, height=300):
         keyPressed(event, data)
         redrawAllWrapper(canvas, data)
 
-    def timerFiredWrapper(canvas, data):
-        timerFired(data)
-        redrawAllWrapper(canvas,data)
-        canvas.after(data.timerDelay, timerFiredWrapper,canvas,data)
 
     # Set up data and call init
     class Struct(object): pass
@@ -750,7 +820,6 @@ def run(width=300, height=300):
     root.bind("<Key>", lambda event:
                             keyPressedWrapper(event, canvas, data))
     redrawAll(canvas, data)
-    timerFiredWrapper(canvas,data)
     # and launch the app
     root.mainloop()  # blocks until window is closed
 

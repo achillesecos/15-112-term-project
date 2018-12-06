@@ -117,8 +117,8 @@ def classScheduleManual(input):
     return classes
 
 def getIntersectionNodes(node1,node2):
-    set1 = set(getIntersectionNodes(node1))
-    set2 = set(getIntersectionNodes(node2))
+    set1 = set(getNeigboringNodes(node1))
+    set2 = set(getNeigboringNodes(node2))
     return set1.intersection(set2)
 
 
