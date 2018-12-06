@@ -1,16 +1,14 @@
-#Achilles Ecos
-#aecos
 # Basic Animation Framework
 # import module_manager
 # module_manager.review()
 #cite run function http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
-#cite image https://www.google.com/search?q=cmu+map&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjS3MLG_IvfAhUMw1kKHahKCnYQ_AUIDygC&biw=468&bih=790#imgrc=NasYLXwhywubrM:
 from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 from dijkstra import *
 import math
 from tkinter import filedialog
+#from schedulepage import *
 from calendar import *
 import datetime
 
@@ -142,6 +140,20 @@ node78 = Node(317,343)
 
 
 
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+# node = Node()
+
+
 
 
 
@@ -254,7 +266,11 @@ graph.addEdge(node77, node78, nodeDistance(node77, node78))
 graph.addEdge(node60, node78, nodeDistance(node60, node78))
 
 
-print('the node distance asdklfja', nodeDistance(node75, node74))
+
+
+
+
+
 
 
 
@@ -271,6 +287,8 @@ def getNeigboringNodes(node):
 
 def recommendPlace(node):
     pass
+
+
 
 
 def classScheduleAutomatic():
@@ -344,12 +362,10 @@ def init(data):
     data.idx = 0
     data.info = ''
 
-    data.nTnDistance = 0
-
 def texts(canvas,data):
     canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
     font = "Times 30 bold", text= "Carnegie Mellon University")
-
+    #MUST CHANGE TO create_text
     canvas.create_text(data.txt1X, data.txt1Y, fill = "blue", \
         text = "Directions", font = "Times 24 bold", anchor = NW)
     canvas.create_text(data.txt1X, data.txt1Y + 50, fill = 'blue', \
@@ -357,14 +373,28 @@ def texts(canvas,data):
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
         text = "Import Schedule", font= "Times 24 bold", anchor = NW)
 
-    canvas.create_text(620,500, fill = 'blue', font = 'Times 20 bold', anchor = NW,
-        text = "Distance: " + str(round(getNTNDistance(data.start,data.end),2)) +' mi')
-
+    # for day in getTimesLocation(data.calendar.Calendar):
+    #     if day == data.currentDay.strftime('%A').upper()[:2]:
+            
+    #         data.currentClasses = 'Your classes for today are: ' + \
+    #             str(getTimesLocation(data.calendar.Calendar)[day])
     if not(data.startBFlag):
         canvas.create_text(data.txt1X, 600, text = data.currentClasses, anchor = NW, \
         fill = 'white', width = 700)
 
     else:
+        # text1 = canvas.create_text(data.txt1X, 600, text = data.str1, anchor = NW, \
+        #     fill = 'white', width = 700)
+
+        # bound1Width = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
+        
+        # text2 = canvas.create_text(data.txt1X + bound1Width, 600, text = data.str2, anchor = NW, \
+        #     fill = 'red', width = 700 - bound1Width)
+
+        # bound2Width = canvas.bbox(text2)[2] - canvas.bbox(text2)[0]
+
+        # canvas.create_text(data.txt1X + bound1Width + bound2Width, 600, text = data.str3, anchor = NW, \
+        #     fill = 'white', width = 700 - bound1Width - bound2Width)
         startX = data.txt1X
         startY = 600
         if hasattr(data,'newStrArr'):
@@ -384,6 +414,8 @@ def texts(canvas,data):
 
 
 
+        # canvas.create_text(data.txt1X, 600, text = data.str1,\
+        # width = 700, anchor = NW, fill = 'white')
 
 
     canvas.create_text(760,607,text = "Start", fill = 'white', anchor = NW)
@@ -422,7 +454,9 @@ def changeScreen(data, x, y):
                 data.newStrArr = data.currentClasses.split(': ')[1].split(',')
                 data.newStrArr.insert(0, data.newStrArr0)
                 data.colorArr = ['white' for i in range(len(data.newStrArr))]
+        data.info = ''
     data.info = ''
+    data.currentClasses = 'Your classes for today are: '
 
 
 
@@ -486,13 +520,9 @@ def drawPathOfSchedule(data):
         print('this is data.start',data.start)
         print('this is data.end',data.end)
 
-def getNTNDistance(node1,node2):
-    if node1 == None or node2 == None:
-        return 0
-    else:
-        return 0.000840336134454 * nodeDistance(node1,node2)
+
     
-print('NTNDistance', getNTNDistance(node36,node50))
+
 
 
 
@@ -501,7 +531,9 @@ def mousePressed(event, data):
     # use event.x and event.y
     changeScreen(data, event.x, event.y)
     desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
-
+    #print(desiredNode)
+    #print(minDistance)
+    #print(data.clickCount)
 
     for location in locations:
         if math.sqrt((locations[location][0] - event.x)**2 + \
@@ -568,9 +600,7 @@ def mousePressed(event, data):
         data.currentClasses = 'Your classes for today are: '
         data.newStrArr = ''
         data.newStrArr0 = ''
-        print(data.currentClasses, 'this is currentClasses')
-        print(data.info, 'info')
-
+        print('this is currentClasses', data.currentClasses)
 
 
     #If user clicks 'Start' button for schedule path finding
@@ -582,11 +612,67 @@ def mousePressed(event, data):
         if data.startButClick >= len(data.colorArr):
             data.startButClick = 1
 
-        data.colorArr[data.startButClick] = 'red'
+        data.colorArr[data.startButClick*2] = 'red'
         data.colorArr[data.startButClick-1] = 'white'
         
         data.idx += 1
         drawPathOfSchedule(data)
+
+
+
+
+
+        #newStrArr = data.currentClasses[28:].split(',')
+        
+
+
+        #coloredSubStr = '<span style=\' color:red;\'>'
+        
+        #print(newStrArr)
+        #coloredSubStr = newStrArr[data.startButClick]
+
+
+        # data.str1 = 'Your classes for today are: ' + \
+        # str(newStrArr[0:data.startButClick+1])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        # print('str1 is', data.str1)
+
+        # data.str2 = str(newStrArr[data.startButClick-1])
+        # print('str2 is', data.str2)
+        # data.str3 = str(newStrArr[data.startButClick:])[2:len(str(newStrArr[:data.startButClick-1]))-2]
+        # print('str3 is', data.str3)
+        # data.currentClasses = 'Your classes for today are: ' + \
+        # str(newStrArr)
+
+        
+
+        #info = ''
+        #drawPathOfSchedule()
+        # for day in getTimesLocation(data.calendar.Calendar):
+        #     if day == data.currentDay.strftime('%A').upper()[:2]:
+        #         print('poop')
+        #         data.currentClasses = 'Your classes for today are: ' + \
+        #             str(getTimesLocation(data.calendar.Calendar)[day])
+
+        #         for item in getTimesLocation(data.calendar.Calendar)[day]:
+        #             print(info, 'this is info')
+        #             info += '"' + item[0] + '"' +\
+        #             ' from ' + str(item[1])[:len(str(item[1]))-2] + ':' + \
+        #             str(item[1])[len(str(item[1]))-2:] +\
+        #             ' to ' + str(item[2])[:len(str(item[1]))-2] + ':' +\
+        #             str(item[2])[len(str(item[1]))-2:] + ','
+        #             data.currentClasses = 'Your classes for today are: ' + \
+        #             info
+        #     info = ''
+
+
+                #print(getTimesLocation(data.calendar.Calendar)[day][item][0], 'fadfasdf')
+
+                #data.currentClasses = 'Your classes for today are: ' + info
+                #info = ''
+
+            #else:
+             #   continue
+
 
 
 
@@ -609,6 +695,20 @@ def textOfLocation(canvas, data):
     print(data.start, data.end)
     print('THE PREVIOUS STUFF',data.previous)
 
+
+# def locationBoundaryOn(canvas, data):
+#     canvas.create_oval(locations[location][0] - \
+#     data.locationResidenceBound, locations[location][1] - \
+#     data.locationResidenceBound, locations[location][0] + \
+#     data.locationResidenceBound, locations[location][1] + \
+#     data.locationResidenceBound, outline = 'blue')
+
+# def locationBoundaryOff(canvas, data):
+#     canvas.create_oval(locations[location][0] - \
+#     data.locationResidenceBound, locations[location][1] - \
+#     data.locationResidenceBound, locations[location][0] + \
+#     data.locationResidenceBound, locations[location][1] + \
+#     data.locationResidenceBound, outline = 'white')
 
 
 def motion(event, canvas, data):
@@ -676,7 +776,9 @@ def redrawAll(canvas, data):
     #drawPathOfSchedule(canvas,data.previous)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
-
+    # if not(data.start is None or data.end is None):
+    #     canvas.create_oval(data.start.x- 5, data.start.y- 5,data.start.x+ 5, data.start.y+ 5)
+    #     canvas.create_oval(data.end.x- 5, data.end.y- 5,data.end.x+ 5, data.end.y+ 5)
     startScheduleButton(canvas,data)
 
 

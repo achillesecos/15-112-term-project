@@ -1,5 +1,8 @@
-#Extracting from calander
+#Achilles Ecos
+#aecos
 
+#Extracting from calander
+#Parsing from ics file
 class Calendar():
 
 	def __init__(self):
@@ -50,17 +53,49 @@ print(achillesCalendar.Calendar)
 
 def getTimesLocation(schedule):
 	result = {}
+	lst = []
 	for day in schedule:
-		#print(schedule[day])
+		print(day + ':')
 		#result[day] = schedule[day]
 		for tup in schedule[day]:
-			#print(schedule[day][tup])
+			print((tup[0],tup[2],tup[3]))
+			lst.append((tup[0],tup[2],tup[3]))
+			lst.sort(key=lambda tup: tup[1])
+
+		result[day] = lst
+		lst = []
 			#for eachInfo in schedule[day][tup]:
-			continue
-				#result[schedule[day][tup][eachInfo][2]] = schedule[day][tup][eachInfo][1]
+			#result[schedule[day][tup][eachInfo][2]] = schedule[day][tup][eachInfo][1]
 	return result
 
-print(getTimesLocation(achillesCalendar.Calendar))
+def getLocations(schedule):
+	result = {}
+	lst = []
+	for day in schedule:
+		print(day + ':')
+		#result[day] = schedule[day]
+		for tup in schedule[day]:
+			print((tup[1]))
+			lst.append((tup[1],tup[2]))
+			lst.sort(key=lambda tup: tup[1])
+
+		result[day] = lst
+		lst = []
+		
+	return result
+
+
+#print(getTimesLocation(achillesCalendar.Calendar)['MO'])
+print(getLocations(achillesCalendar.Calendar))
+
+def getTodayClasses(schedule,day):
+	result = []
+	for i in range(1,len(schedule[day])):
+		print('result is', result)
+		result.append((schedule[day][i-1][0][9:], schedule[day][i][0][9:]))
+	return result
+
+print(getTodayClasses(getLocations(achillesCalendar.Calendar), 'MO'))
 
 
 
@@ -85,8 +120,8 @@ def classScheduleManual(input):
     return classes
 
 def getIntersectionNodes(node1,node2):
-    set1 = set(getIntersectionNodes(node1))
-    set2 = set(getIntersectionNodes(node2))
+    set1 = set(getNeigboringNodes(node1))
+    set2 = set(getNeigboringNodes(node2))
     return set1.intersection(set2)
 
 

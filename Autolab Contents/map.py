@@ -1,13 +1,18 @@
+#Achilles Ecos
+#aecos
 # Basic Animation Framework
 # import module_manager
 # module_manager.review()
 #cite run function http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
+#cite image https://www.google.com/search?q=cmu+map&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjS3MLG_IvfAhUMw1kKHahKCnYQ_AUIDygC&biw=468&bih=790#imgrc=NasYLXwhywubrM:
 from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 from dijkstra import *
 import math
-#from schedulepage import *
+from tkinter import filedialog
+from calendar import *
+import datetime
 
 
 
@@ -33,6 +38,29 @@ class Node:
         return hash((self.x,self.y))
 
 
+#All locations 
+locations = {"Parking Lot":(572,155), "Baker/Porter Hall":(403,508), \
+            "College of Fine Arts":(525,426), "Cyert Hall":(335,263), \
+            "Doherty Hall":(393,420), "Gates-Hillman Center":(335,332),\
+            "Hammerschlag Hall":(285,499), "Hunt Library":(503,483), \
+            "Newell-Simon Hall":(285,389), "Posner Hall":(583,436), \
+            "Purnell Center":(394,314), "Scaife Hall":(270,562), \
+            "Skibo Gym":(644,405), "University Center":(494,265), \
+            "Wean Hall":(316,442), "Tepper Quad":(242,207)}
+
+#All residences
+residences = {'The Hill Residences':(748,264), 'Donner House':(667,291), \
+            'Resnik Cafe':(640,246), 'West Wing':(585,264), \
+            'Morewood Tower':(317,153), 'Stever House':(299,72), \
+            'Mudge House':(254,43)}
+
+
+classLocations = {'GHC':(335,332), 'POS':(583,436), 'WEH':(316,442), \
+            'PH':(403,508), 'SH':(270,562), 'DH':(393,420), 'BH':(403,508),\
+            'TEP':(242,207), 'TBA':(335,332)}
+
+
+#All intersections of paths
 node1 = Node(758,150)
 node2 = Node(702,262)
 node3 = Node(686,247)
@@ -109,21 +137,9 @@ node73 = Node(190,342)
 node74 = Node(340,93)
 node75 = Node(258,7)
 node76 = Node(439,420)
+node77 = Node(356,353)
+node78 = Node(317,343)
 
-
-
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
-# node = Node()
 
 
 
@@ -218,7 +234,7 @@ graph.addEdge(node38, node48, nodeDistance(node38, node48))
 graph.addEdge(node48, node62, nodeDistance(node48, node62))
 graph.addEdge(node62, node55, nodeDistance(node62, node55))
 graph.addEdge(node35, node57, nodeDistance(node35, node57))
-graph.addEdge(node35, node57, nodeDistance(node35, node57))
+graph.addEdge(node35, node33, nodeDistance(node35, node33))
 graph.addEdge(node56, node57, nodeDistance(node56, node57))
 graph.addEdge(node57, node58, nodeDistance(node57, node58))
 graph.addEdge(node58, node59, nodeDistance(node58, node59))
@@ -233,8 +249,19 @@ graph.addEdge(node74, node75, nodeDistance(node74, node75))
 graph.addEdge(node42, node76, nodeDistance(node42, node76))
 graph.addEdge(node76, node49, nodeDistance(node76, node49))
 graph.addEdge(node49, node50, nodeDistance(node49, node50))
+graph.addEdge(node39, node77, nodeDistance(node39, node77))
+graph.addEdge(node77, node78, nodeDistance(node77, node78))
+graph.addEdge(node60, node78, nodeDistance(node60, node78))
 
-#print(dijkstra(graph,node1,node10))
+
+print('the node distance asdklfja', nodeDistance(node75, node74))
+
+
+
+
+
+
+print('Test grapjhhhhh',dijkstra(graph,node75,node49))
 
 
 
@@ -244,8 +271,6 @@ def getNeigboringNodes(node):
 
 def recommendPlace(node):
     pass
-
-
 
 
 def classScheduleAutomatic():
@@ -290,24 +315,78 @@ def init(data):
     data.txt2X = 20
     data.txt2Y = 170
     data.graph = graph
-    data.previous = dijkstra(graph, node1, node1)[1]
-    data.start = node1
-    data.end = node1
+    data.previous = None
+    data.start = None
+    data.end = None
     data.bound = 15
     data.clickCount = 0
 
+    #dealing with locations
+    data.locationResidenceBound = 30
+    data.startLocation = ''
+    data.endLocation = ''
 
+    #calendar
+    data.calendar = Calendar()
+    data.currentDay = datetime.datetime.now()
+    data.currentTime = datetime.datetime.now()
+    data.currentClasses = 'Your classes for today are: '
+    
+    data.startButClick = 0
+    data.str1 = ''
+    data.str2 = ''
+    data.str3 = ''
+    data.startBFlag = False
 
+    data.colorArr = []
+
+    data.timerCounter = 0
+    data.idx = 0
+    data.info = ''
+
+    data.nTnDistance = 0
 
 def texts(canvas,data):
-    #MUST CHANGE TO create_text
+    canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
+    font = "Times 30 bold", text= "Carnegie Mellon University")
+
     canvas.create_text(data.txt1X, data.txt1Y, fill = "blue", \
         text = "Directions", font = "Times 24 bold", anchor = NW)
     canvas.create_text(data.txt1X, data.txt1Y + 50, fill = 'blue', \
         text = "Select a start and end point", font = 'Times 15', anchor = NW)
     canvas.create_text(data.txt2X, data.txt2Y, fill = "blue", \
         text = "Import Schedule", font= "Times 24 bold", anchor = NW)
-    
+
+    canvas.create_text(620,500, fill = 'blue', font = 'Times 20 bold', anchor = NW,
+        text = "Distance: " + str(round(getNTNDistance(data.start,data.end),2)) +' mi')
+
+    if not(data.startBFlag):
+        canvas.create_text(data.txt1X, 600, text = data.currentClasses, anchor = NW, \
+        fill = 'white', width = 700)
+
+    else:
+        startX = data.txt1X
+        startY = 600
+        if hasattr(data,'newStrArr'):
+            for i in range(len(data.colorArr)):
+                text1 = canvas.create_text(startX, startY, text = data.newStrArr[i], anchor = NW,\
+                    fill = data.colorArr[i], width = 700, tag = 'textTag' + str(i))
+                boundWidth = canvas.bbox(text1)[2] - canvas.bbox(text1)[0]
+                startX += boundWidth
+                if canvas.bbox(text1)[2] >= 700:
+                    boundHeight = canvas.bbox(text1)[3] - canvas.bbox(text1)[1]
+                    canvas.delete('textTag' + str(i))
+                    startY += boundHeight
+                    startX = data.txt1X
+                    text1 = canvas.create_text(startX, startY, text = data.newStrArr[i], anchor = NW,\
+                    fill = data.colorArr[i], width = 700)
+                    startX += boundWidth
+
+
+
+
+
+    canvas.create_text(760,607,text = "Start", fill = 'white', anchor = NW)
 
     
 
@@ -315,22 +394,49 @@ def changeScreen(data, x, y):
     #checks to see if user clicks on the text button
     if(x >= data.txt2X and x <= data.txt2X + 167 and \
         y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
-        exec(open(r'schedulepage.py').read())
+        filename = filedialog.askopenfilename(initialdir = "/",title = "Select file", \
+            filetypes = (("ics files","*.ics"),("all files","*.*")))
+        #exec(open(r'schedulepage.py').read())
+        data.calendar.classSchedule(filename)
+        # print(data.calendar.Calendar)
 
 
-# def changeScreen(data, x, y):
-#     #checks to see if user clicks on the text button
-#     if(x >= data.txt2X and x <= data.txt2X + 167 and \
-#         y >= data.txt2Y + 47 and y <= data.txt2Y + 85):
-#         #page1.mainloop()
-#         pass
+    
+    for day in getTimesLocation(data.calendar.Calendar):
+        # print(day)
+        # print(data.currentDay.strftime('%A').upper()[:2])
+    #check 'MO' for monday, since there are no classes SA and SU
+    
+        if day == data.currentDay.strftime('%A').upper()[:2]:
+
+            for item in getTimesLocation(data.calendar.Calendar)[day]:
+                print(data.info, 'this is info')
+                data.info += '"' + item[0] + '"' +\
+                ' from ' + str(item[1])[:len(str(item[1]))-2] + ':' + \
+                str(item[1])[len(str(item[1]))-2:] +\
+                ' to ' + str(item[2])[:len(str(item[1]))-2] + ':' +\
+                str(item[2])[len(str(item[1]))-2:] + ', '
+                data.currentClasses = 'Your classes for today are: ' + \
+                data.info
+                data.newStrArr0 = data.currentClasses.split(': ')[0]
+                data.newStrArr = data.currentClasses.split(': ')[1].split(',')
+                data.newStrArr.insert(0, data.newStrArr0)
+                data.colorArr = ['white' for i in range(len(data.newStrArr))]
+    data.info = ''
+
+
+
+            # data.currentClasses = 'Your classes for today are: ' + \
+            #     str(getTimesLocation(data.calendar.Calendar)[day])
     
 def drawPath(canvas, previous, start, end):
     while previous[end] != None:
         canvas.create_line(end.x,end.y,previous[end].x, \
             previous[end].y, fill = 'blue', width = 3)
         end = previous[end]
-        #print(previous)
+        print(previous)
+        print(previous[end])
+
 
 
 def resetButtonOff(canvas, data):
@@ -363,52 +469,195 @@ def importScheduleButtonOn(canvas,data):
         font = 'Times 15', anchor = NW)
         
 
+def drawPathOfSchedule(data):
+    #class to class array
+    CTCArr = getTodayClasses(getLocations(data.calendar.Calendar), \
+        data.currentDay.strftime('%A').upper()[:2])
+    # for pair in CTCArr:
+    #     print('start',classLocations[pair[0]])
+    #     print('end',classLocations[pair[1]])
+    print('class Locations', classLocations)
+
+    if data.startButClick != 0:
+        data.start = getNearestNode(data.graph, classLocations[CTCArr[data.startButClick-1][0]][0], \
+            classLocations[CTCArr[data.startButClick-1][0]][1])[0]
+        data.end = getNearestNode(data.graph, classLocations[CTCArr[data.startButClick][1]][0], \
+            classLocations[CTCArr[data.startButClick][1]][1])[0]
+        print('this is data.start',data.start)
+        print('this is data.end',data.end)
+
+def getNTNDistance(node1,node2):
+    if node1 == None or node2 == None:
+        return 0
+    else:
+        return 0.000840336134454 * nodeDistance(node1,node2)
+    
+print('NTNDistance', getNTNDistance(node36,node50))
+
+
 
 
 def mousePressed(event, data):
     # use event.x and event.y
     changeScreen(data, event.x, event.y)
     desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
-    #print(desiredNode)
-    #print(minDistance)
-    #print(data.clickCount)
+
+
+    for location in locations:
+        if math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (location)
+            data.startLocation = location
+            data.start = desiredNode
+            print(desiredNode, 'theStartLocation1')
+            data.clickCount += 1
+
+
+        elif math.sqrt((locations[location][0] - event.x)**2 + \
+            (locations[location][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(location)
+            data.endLocation = location
+            data.end = desiredNode
+            print(desiredNode, 'theEndLocation2')
+            data.clickCount += 1
+
+    for residence in residences:
+        if math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 0:
+            print (residence)
+            data.startLocation = residence
+            data.start = desiredNode
+            print(desiredNode, 'theStartResidence3')
+            data.clickCount += 1
+            print(data.clickCount)
+
+        elif math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound and \
+        data.clickCount == 1:
+            print(residence)
+            data.endLocation = residence
+            print(desiredNode, 'theEndResidence4')
+            data.end = desiredNode
+            data.clickCount += 1
+
+
+
     if minDistance <= data.bound and data.clickCount == 0:
         data.start = desiredNode
         data.clickCount += 1
 
     elif minDistance <= data.bound and data.clickCount == 1:
         data.end = desiredNode
+        
         data.clickCount += 1
 
     elif event.x >= data.txt1X and event.x <= data.txt1X + 45 and \
         event.y >= data.txt1Y + 70 and event.y <= data.txt2Y + 87:
-        data.start = node1
-        data.end = node1
+        data.start = None
+        data.end = None
         #desiredNode, minDistance = getNearestNode(data.graph, event.x, event.y)
-        data.clickCount == 0
+        data.clickCount = 0
+        data.startLocation = ''
+        data.endLocation = ''
+        #data.newStrArr = 'Your classes for today are: '
+        #print(data.newStrArr)
+        data.startBFlag = False
+        data.currentClasses = 'Your classes for today are: '
+        data.newStrArr = ''
+        data.newStrArr0 = ''
+        print(data.currentClasses, 'this is currentClasses')
+        print(data.info, 'info')
+
+
+
+    #If user clicks 'Start' button for schedule path finding
+    if event.x >= 750 and event.x <= 800 and event.y >= 600 and \
+    event.y <= 630:
+        data.startBFlag = True
+        data.startButClick += 1
+
+        if data.startButClick >= len(data.colorArr):
+            data.startButClick = 1
+
+        data.colorArr[data.startButClick] = 'red'
+        data.colorArr[data.startButClick-1] = 'white'
         
+        data.idx += 1
+        drawPathOfSchedule(data)
+
+
+
+
+def scheduleBox(canvas, data):
+    canvas.create_rectangle(0,580,810,650,fill = 'blue')
+
+def startScheduleButton(canvas,data):
+    canvas.create_rectangle(750,600,800,630,outline = 'white')
+
+
+def textOfLocation(canvas, data):
+    canvas.create_text(data.txt2X, data.txt2Y + 300, fill = 'blue', \
+        text = "Start: " + data.startLocation, anchor = NW)
+    canvas.create_text(data.txt2X, data.txt2Y + 350, fill = 'blue', \
+        text = "End: " + data.endLocation, anchor = NW) 
         
         
     data.previous = dijkstra(graph, data.start, data.end)[1]
     print(data.start, data.end)
-    print(data.previous)
+    print('THE PREVIOUS STUFF',data.previous)
+
 
 
 def motion(event, canvas, data):
-        flag = False
-        x, y = event.x, event.y
-        #print('{}, {}'.format(x,y))
-        if x >= data.txt1X and x <= data.txt1X + 45 and \
-        y >= data.txt1Y + 70 and y <= data.txt1Y + 87:
-            resetButtonOn(canvas,data)
-        else:
-            resetButtonOff(canvas,data)
+    flag = False
+    x, y = event.x, event.y
+    #print('{}, {}'.format(x,y))
+    if x >= data.txt1X and x <= data.txt1X + 45 and \
+    y >= data.txt1Y + 70 and y <= data.txt1Y + 87:
+        resetButtonOn(canvas,data)
+    else:
+        resetButtonOff(canvas,data)
 
-        if x >= data.txt2X and x <= data.txt2X + 167 and \
-        y >= data.txt2Y + 47 and y <= data.txt2Y + 85:
-            importScheduleButtonOn(canvas,data)
-        else:
-            importScheduleButtonOff(canvas,data)
+    if x >= data.txt2X and x <= data.txt2X + 167 and \
+    y >= data.txt2Y + 47 and y <= data.txt2Y + 85:
+        importScheduleButtonOn(canvas,data)
+    else:
+        importScheduleButtonOff(canvas,data)
+
+    locationFlag = False
+    for location in locations:
+        if math.sqrt((locations[location][0] - x)**2 + \
+            (locations[location][1] - y)**2)< data.locationResidenceBound:
+            canvas.create_oval(locations[location][0] - \
+            data.locationResidenceBound, locations[location][1] - \
+            data.locationResidenceBound, locations[location][0] + \
+            data.locationResidenceBound, locations[location][1] + \
+            data.locationResidenceBound, outline = 'blue', tags = 'circle1')
+            locationFlag = True
+            # print(canvas.circle1)
+        # elif not math.sqrt((locations[location][0] - event.x)**2 + \
+        #     (locations[location][1] - event.y)**2)< data.locationResidenceBound:
+    if not locationFlag:
+        canvas.delete('circle1')
+
+    residenceFlag = False
+    for residence in residences:
+        if math.sqrt((residences[residence][0] - event.x)**2 + \
+            (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
+            canvas.create_oval(residences[residence][0] - \
+            data.locationResidenceBound, residences[residence][1] - \
+            data.locationResidenceBound, residences[residence][0] + \
+            data.locationResidenceBound, residences[residence][1] + \
+            data.locationResidenceBound, outline = 'blue', tags = 'circle2')
+            residenceFlag = True
+            # print(canvas.circle2)
+        # elif not math.sqrt((residences[residence][0] - event.x)**2 + \
+        #     (residences[residence][1] - event.y)**2)< data.locationResidenceBound:
+    if not residenceFlag:
+        canvas.delete('circle2')
 
 
 def keyPressed(event, data):
@@ -417,13 +666,20 @@ def keyPressed(event, data):
 
 def redrawAll(canvas, data):
     canvas.create_image(0, 0,anchor = NW, image = data.picture)
-    canvas.create_text(data.width/2 + 70, 20, fill = "maroon", \
-    font = "Times 30 bold", text= "Carnegie Mellon University")
+    scheduleBox(canvas,data)
     texts(canvas, data)
-    drawPath(canvas, data.previous, data.start, data.end)
+    textOfLocation(canvas, data)
+    if data.end != data.start and not(data.start is None or data.end is None):
+        drawPath(canvas, data.previous, data.start, data.end)
+
+
+    #drawPathOfSchedule(canvas,data.previous)
     resetButtonOff(canvas,data)
     importScheduleButtonOff(canvas,data)
-    
+
+    startScheduleButton(canvas,data)
+
+
 #mapImg = cv2.imread("cmumap.png")
 #img = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarry(mapImg))
 #canvas.create_image(0,0,anchor = NW, image = img)
@@ -447,11 +703,13 @@ def run(width=300, height=300):
         keyPressed(event, data)
         redrawAllWrapper(canvas, data)
 
+
     # Set up data and call init
     class Struct(object): pass
     data = Struct()
     data.width = width
     data.height = height
+    data.timerDelay = 100
     root = Tk()
     root.resizable(width=False, height=False) # prevents resizing window
     init(data)
@@ -476,4 +734,4 @@ def run(width=300, height=300):
     # and launch the app
     root.mainloop()  # blocks until window is closed
 
-run(810, 580)
+run(810, 650)

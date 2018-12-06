@@ -1,5 +1,8 @@
-#Extracting from calander
+#Achilles Ecos
+#aecos
 
+#Extracting from calander
+#Parsing from ics file
 class Calendar():
 
 	def __init__(self):
