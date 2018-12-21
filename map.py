@@ -266,7 +266,8 @@ print('Test grapjhhhhh',dijkstra(graph,node75,node49))
 
 
 def getNeigboringNodes(node):
-    neighboringNodes = [dijkstra.getNeighbors(node)]
+
+    neighboringNodes = graph.getNeighbors(node)
     return neighboringNodes
 
 def recommendPlace(node):
@@ -283,9 +284,13 @@ def classScheduleManual(input):
     return classes
 
 def getIntersectionNodes(node1,node2):
-    set1 = set(getIntersectionNodes(node1))
-    set2 = set(getIntersectionNodes(node2))
-    return set1.intersection(set2)
+    while node1 != None and node2 != None:
+        set1 = set(getNeigboringNodes(node1))
+        print(set1, 'set 1')
+        set2 = set(getNeigboringNodes(node2))
+        print(set1, 'set 2')
+        #print(set1.intersection(set2), 'this is intersection')
+        return set1.intersection(set2)
     
 
 #user inputs the different classes
@@ -359,6 +364,9 @@ def texts(canvas,data):
 
     canvas.create_text(620,500, fill = 'blue', font = 'Times 20 bold', anchor = NW,
         text = "Distance: " + str(round(getNTNDistance(data.start,data.end),2)) +' mi')
+
+    canvas.create_text(440, 550, fill = 'blue', font = 'Times 20 bold', anchor = NW,
+        text = 'Nearby Places: ' + str(getIntersectionNodes(data.start, data.end)))
 
     if not(data.startBFlag):
         canvas.create_text(data.txt1X, 600, text = data.currentClasses, anchor = NW, \
