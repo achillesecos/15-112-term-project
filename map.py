@@ -288,8 +288,8 @@ def getIntersectionNodes(node1,node2):
         set1 = set(getNeigboringNodes(node1))
         print(set1, 'set 1')
         set2 = set(getNeigboringNodes(node2))
-        print(set1, 'set 2')
-        #print(set1.intersection(set2), 'this is intersection')
+        print(set2, 'set 2')
+        print(set1.intersection(set2), 'this is intersection')
         return set1.intersection(set2)
     
 
